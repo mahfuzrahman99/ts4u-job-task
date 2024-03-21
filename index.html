@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Table</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #000;
+        padding: 8px;
+        text-align: center;
+      }
+      th {
+        background-color: #cfe2f3;
+      }
+      input[type="number"] {
+        width: 95%;
+        padding: 3px;
+        border-radius: 5px;
+      }
+      .btn-all {
+        margin: 15px 0px;
+      }
+      .btn-all button {
+        padding: 7px 10px;
+        background-color: #cfe2f3;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      .btn-row {
+        padding: 7px 10px;
+        background-color: #cfe2f3;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="btn-all" id="buttons">
+      <button id="insertBtn" onclick="insertRow()">Insert Row</button>
+      <button id="clearBtn" style="display: none" onclick="clearRows()">
+        Clear Rows
+      </button>
+      <button
+        id="submitBtn"
+        style="display: none"
+        onclick="submitData()"
+        disabled
+      >
+        Submit
+      </button>
+    </div>
+    <table id="data-table" style="display: none">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Amount</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Table body dynamically eshe ekhane add hobe -->
+      </tbody>
+    </table>
+
+    <script>
+      let rowCount = 0;
+
+      function buttonsAndTableVisibility() {
+        const clearBtn = document.getElementById("clearBtn");
+        const submitBtn = document.getElementById("submitBtn");
+        const table = document.getElementById("data-table");
+
+        if (rowCount === 0) {
+          clearBtn.style.display = "none";
+          submitBtn.style.display = "none";
+          table.style.display = "none";
+        } else {
+          clearBtn.style.display = "inline-block";
+          submitBtn.style.display = "inline-block";
+          table.style.display = "table";
+        }
+      }
+
+      function insertRow() {
+        rowCount++;
+        buttonsAndTableVisibility();
+
+        const tableBody = document.querySelector("#data-table tbody");
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `
+            <td>Item ${rowCount}</td>
+            <td><input type="number" id="amount-${rowCount}" name="amount" oninput="checkInput(this)"></td>
+            <td><button class="btn-row" onclick="removeRow(this)">Remove</button></td>
+        `;
+        tableBody.appendChild(newRow);
+      }
+
+      function clearRows() {
+        const tableBody = document.querySelector("#data-table tbody");
+        tableBody.innerHTML = "";
+        rowCount = 0;
+        buttonsAndTableVisibility();
+        checkSubmitBtn();
+      }
+
+      function removeRow(button) {
+        const row = button.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+        rowCount--;
+        buttonsAndTableVisibility();
+        checkSubmitBtn();
+      }
+
+      function checkInput(input) {
+        checkSubmitBtn();
+      }
+
+      function checkSubmitBtn() {
+        const submitBtn = document.getElementById("submitBtn");
+        const inputs = document.querySelectorAll(
+          "#data-table input[type='number']"
+        );
+        let enableSubmit = false;
+
+        inputs.forEach((input) => {
+          if (input.value.trim() !== "") {
+            enableSubmit = true;
+          }
+        });
+
+        if (enableSubmit) {
+          submitBtn.removeAttribute("disabled");
+        } else {
+          submitBtn.setAttribute("disabled", "true");
+        }
+      }
+
+      function submitData() {
+        const data = [];
+        const tableRows = document.querySelectorAll("#data-table tbody tr");
+        tableRows.forEach((row) => {
+          const item = row.querySelector("td:first-child").textContent;
+          const amount = row.querySelector("input[type='number']").value;
+          data.push({ item, amount });
+        });
+        console.log(data);
+      }
+    </script>
+  </body>
+</html>
